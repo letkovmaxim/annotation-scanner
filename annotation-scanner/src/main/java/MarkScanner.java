@@ -33,19 +33,22 @@ public class MarkScanner {
                 Annotation[] ann = fl.getAnnotations();
                 for (Annotation an : ann) {
                     System.out.print(getSpace() + ((Marked) an).name() + ": ");
-                    //Примитивный или строка - выводим значение
-                    if (fl.getType().isPrimitive() || (fl.getType() == String.class)) {
-                        try {
-                            fl.setAccessible(true);
-                            System.out.println(fl.get(cls.getDeclaredConstructor().newInstance()));
-                        } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException | InstantiationException e) {
-                            System.out.println(fl.getType().getSimpleName());
+                    try {
+                        //Получаем и выводим значение поля
+                        fl.setAccessible(true);
+                        Object value = fl.get(cls.getDeclaredConstructor().newInstance());
+                        System.out.println(value);
+
+                        //Не примитивный и не строка - разбираем уровень ниже, если значене не null
+                        if (!fl.getType().isPrimitive() && fl.getType() != String.class) {
+                            if (value != null) {
+                                recursionLevel++;
+                                scan(fl.getType());
+                                recursionLevel--;
+                            }
                         }
-                    } else { //Разбираем уровень ниже
+                    } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException | InstantiationException e) {
                         System.out.println(fl.getType().getSimpleName());
-                        recursionLevel++;
-                        scan(fl.getType());
-                        recursionLevel--;
                     }
                 }
             }
