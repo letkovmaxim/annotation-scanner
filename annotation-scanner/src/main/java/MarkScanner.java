@@ -40,7 +40,7 @@ public class MarkScanner {
                             Object value = fl.get(cls.getDeclaredConstructor().newInstance());
                             System.out.println(value);
 
-                            //Не примитивный и не строка - разбираем уровень ниже, если значене не null
+                            //Не примитивный - разбираем уровень ниже, если значене не null
                             if (!fl.getType().isPrimitive()) {
                                 if (value != null) {
                                     recursionLevel++;
