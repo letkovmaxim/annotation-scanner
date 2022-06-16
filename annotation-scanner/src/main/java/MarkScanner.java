@@ -32,23 +32,26 @@ public class MarkScanner {
                 //Аннотации поля
                 Annotation[] ann = fl.getAnnotations();
                 for (Annotation an : ann) {
-                    System.out.print(getSpace() + ((Marked) an).name() + ": ");
-                    try {
-                        //Получаем и выводим значение поля
-                        fl.setAccessible(true);
-                        Object value = fl.get(cls.getDeclaredConstructor().newInstance());
-                        System.out.println(value);
+                    if (an instanceof Marked) {
+                        System.out.print(getSpace() + ((Marked) an).name() + ": ");
+                        try {
+                            //Получаем и выводим значение поля
+                            fl.setAccessible(true);
+                            Object value = fl.get(cls.getDeclaredConstructor().newInstance());
+                            System.out.println(value);
 
-                        //Не примитивный и не строка - разбираем уровень ниже, если значене не null
-                        if (!fl.getType().isPrimitive() && fl.getType() != String.class) {
-                            if (value != null) {
-                                recursionLevel++;
-                                scan(fl.getType());
-                                recursionLevel--;
+                            //Не примитивный и не строка - разбираем уровень ниже, если значене не null
+                            if (!fl.getType().isPrimitive()) {
+                                if (value != null) {
+                                    recursionLevel++;
+                                    scan(fl.getType());
+                                    recursionLevel--;
+                                }
                             }
+                        } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException |
+                                 InstantiationException e) {
+                            System.out.println(fl.getType().getSimpleName());
                         }
-                    } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException | InstantiationException e) {
-                        System.out.println(fl.getType().getSimpleName());
                     }
                 }
             }
